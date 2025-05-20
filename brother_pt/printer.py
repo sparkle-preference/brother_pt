@@ -109,7 +109,7 @@ class BrotherPt:
     def text_color(self) -> TextColor:
         return self._text_color
 
-    def print_data(self, data:bytes, margin_px:int):
+    def print_data(self, data:bytes, margin_px:int, is_last_page:bool=True):
         self.__write(enter_dynamic_command_mode())
         self.__write(enable_status_notification())
         self.__write(print_information(data, self.media_width))
@@ -119,7 +119,16 @@ class BrotherPt:
         self.__write(set_compression_mode())
         for cmd in gen_raster_commands(data):
             self.__write(cmd)
-        self.__write(print_with_feeding())
+
+        # Send 6 blank lines to ensure the printer finishes the print job
+        # (This gets image aligned properly in P710BT)
+        for _ in range(6):
+            self.__write(b'\x5A')
+
+        if is_last_page:
+            self.__write(print_with_feeding())
+        else:
+            self.__write(print_without_feeding())
         while True:
             res = self.__read()
             if len(res) > 0:
@@ -150,14 +159,17 @@ class BrotherPt:
                         error_message = error_message[:-1]
                     raise RuntimeError(error_message)
 
-    def print_image(self, image: Image, margin_px: int = 0):
+    def print_images(self, images: list[Image], margin_px: int = 0):
         self.update_status()
-        image = prepare_image(image, self.media_width)
-        if (image.width + margin_px) < MINIMUM_TAPE_POINTS:
-            warnings.warn("Image (%i) + cut margin (%i) is smaller than minimum tape width (%i) ... "
-                          "cutting length will be extended" % (image.width, margin_px, MINIMUM_TAPE_POINTS))
-        data = raster_image(image, self.media_width)
-        self.print_data(data, margin_px)
+        pages_left = len(images)
+        for image in images:
+            image = prepare_image(image, self.media_width)
+            if (image.width + margin_px) < MINIMUM_TAPE_POINTS:
+                warnings.warn("Image (%i) + cut margin (%i) is smaller than minimum tape width (%i) ... "
+                              "cutting length will be extended" % (image.width, margin_px, MINIMUM_TAPE_POINTS))
+            data = raster_image(image, self.media_width)
+            pages_left -= 1
+            self.print_data(data, margin_px, pages_left == 0)
 
 
 if __name__ == '__main__':
