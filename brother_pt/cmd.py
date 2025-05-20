@@ -131,6 +131,7 @@ class TapeColor(IntEnum):
     GREEN = 0x07
     BLACK = 0x08
     CLEAR_WHITE_TEXT = 0x09
+    BROWN = 11
     MATTE_WHITE = 0x20
     MATTE_CLEAR = 0x21
     MATTE_SILVER = 0x22
