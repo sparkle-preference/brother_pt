@@ -15,7 +15,10 @@
 """
 VERSION = '1.1'
 
-from .printer import *
+from PIL import Image
+from .printer import find_printers, BrotherPt, MediaWidthToTapeMargin
+from .cmd import MINIMUM_TAPE_POINTS
+from .raster import make_fit, select_raster_channel, raster_image
 
 def show_status(serial):
     printers = find_printers(serial)

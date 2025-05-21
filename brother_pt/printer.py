@@ -19,9 +19,13 @@ import usb.core
 import usb.util
 import warnings
 
-from .cmd import *
-from .raster import *
-
+from .raster import (prepare_image, raster_image)
+from PIL import Image
+from .cmd import (SupportedPrinterIDs, StatusOffsets,StatusType, TapeColor, TextColor, print_information,
+            invalidate, initialize, enter_dynamic_command_mode, enable_status_notification, set_mode,
+            set_advanced_mode, margin_amount, set_compression_mode, gen_raster_commands, print_without_feeding,
+            print_with_feeding, status_information_request, USBID_BROTHER, USB_OUT_EP_ID, USB_TRX_TIMEOUT_MS, 
+            MINIMUM_TAPE_POINTS, USB_IN_EP_ID, STATUS_MESSAGE_LENGTH, MediaType)
 
 def find_printers(serial=None):
     found_printers = []
