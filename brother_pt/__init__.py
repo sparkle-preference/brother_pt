@@ -16,8 +16,8 @@
 VERSION = '1.1'
 
 from PIL import Image
-from .printer import find_printers, BrotherPt, MediaWidthToTapeMargin
-from .cmd import MINIMUM_TAPE_POINTS
+from .printer import find_printers, BrotherPt
+from .cmd import MediaWidthToTapeMargin
 from .raster import make_fit, select_raster_channel, raster_image
 
 def show_status(serial):
