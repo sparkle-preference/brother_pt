@@ -16,7 +16,7 @@
 
 
 import sys
-from consts import VERSION
+from ..consts import VERSION
 from PIL import Image
 from .printer import find_printers, BrotherPt
 from .cmd import MediaWidthToTapeMargin, MINIMUM_TAPE_POINTS
