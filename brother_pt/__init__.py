@@ -13,12 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-VERSION = '1.3'
+VERSION = '1.4'
 
 import sys
 from PIL import Image
 from .printer import find_printers, BrotherPt
-from .cmd import MediaWidthToTapeMargin
+from .cmd import MediaWidthToTapeMargin, MINIMUM_TAPE_POINTS
 from .raster import make_fit, select_raster_channel, raster_image
 
 def show_status(serial):
@@ -36,10 +36,10 @@ def show_status(serial):
     print()
     return 0
 
-def do_print(printer, file, margin = 0, rotate = '0', dry_run = False):
-   return print_all(printer, [file], margin, rotate)
+def do_print( file, printer = None, margin = 0, rotate = '0', dry_run = False):
+   return print_all([file], printer, margin, rotate, dry_run)
 
-def print_all(printer, files, margin = 0, rotate = '0', dry_run = False):
+def print_all(files, printer = None, margin = 0, rotate = '0', dry_run = False):
     printers = find_printers(printer)
     if len(printers) == 0:
         print("No supported printers found, make sure the device is switched on", file=sys.stderr)
