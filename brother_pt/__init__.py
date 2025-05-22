@@ -13,15 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
+VERSION = '1.9'
 
 import sys
-from ..consts import VERSION
-from PIL import Image
-from .printer import find_printers, BrotherPt
-from .cmd import MediaWidthToTapeMargin, MINIMUM_TAPE_POINTS
-from .raster import make_fit, select_raster_channel, raster_image
-
+try:
+    from PIL import Image
+    from .printer import find_printers, BrotherPt
+    from .cmd import MediaWidthToTapeMargin, MINIMUM_TAPE_POINTS
+    from .raster import make_fit, select_raster_channel, raster_image
+except ImportError:
+    # happens in setup.py because of my dumb module structure
+    pass
 def show_status(serial):
     printers = find_printers(serial)
     if len(printers) == 0:
