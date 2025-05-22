@@ -15,7 +15,7 @@
 """
 
 from distutils.core import setup
-from brother_pt import VERSION
+from . import VERSION
 
 setup(name='brother_pt',
       version=VERSION,
