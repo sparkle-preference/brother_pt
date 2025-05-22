@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-VERSION = '1.1'
+VERSION = '1.3'
 
 import sys
 from PIL import Image
@@ -36,9 +36,11 @@ def show_status(serial):
     print()
     return 0
 
+def do_print(printer, file, margin = 0, rotate = '0', dry_run = False):
+   return print_all(printer, [file], margin, rotate)
 
-def do_print(args):
-    printers = find_printers(args.printer)
+def print_all(printer, files, margin = 0, rotate = '0', dry_run = False):
+    printers = find_printers(printer)
     if len(printers) == 0:
         print("No supported printers found, make sure the device is switched on", file=sys.stderr)
         return 1
@@ -46,24 +48,24 @@ def do_print(args):
     found_printer = BrotherPt(printers[0].serial_number)
 
     rasters = []
-    for file in args.file:
+    for file in files:
         image = Image.open(file)
         required_height = MediaWidthToTapeMargin.to_print_width(found_printer.media_width)
 
         # Apply rotation as specified
-        if args.rotate == 'auto':
+        if rotate == 'auto':
             adjusted_image = make_fit(image, found_printer.media_width)
             if adjusted_image is None:
                 print('Could not auto-rotate image, at least one dimension needs to match the tape width (%i, %i) vs %i',
                     (image.width, image.height, required_height), file=sys.stderr)
                 return 1
-        elif args.rotate == '0':
+        elif rotate == '0':
             adjusted_image = image
-        elif args.rotate == '90':
+        elif rotate == '90':
             adjusted_image = image.rotate(90, expand=True)
-        elif args.rotate == '180':
+        elif rotate == '180':
             adjusted_image = image.rotate(180, expand=True)
-        elif args.rotate == '270':
+        elif rotate == '270':
             adjusted_image = image.rotate(270, expand=True)
         else:
             print('Invalid rotation specified %s', file=sys.stderr)
@@ -76,7 +78,7 @@ def do_print(args):
         image = select_raster_channel(adjusted_image)
 
         # Margin check
-        margin = args.margin
+        margin = margin
         if (image.width + margin) < MINIMUM_TAPE_POINTS:
             print("Image (%i) + cut margin (%i) is smaller than minimum tape width (%i) ...\n"
                 "cutting length will be extended" % (image.width, margin, MINIMUM_TAPE_POINTS))
@@ -89,7 +91,8 @@ def do_print(args):
     # Print images
     for i, raster in enumerate(rasters):
         print("Printing raster %i / %i..." % (i+1, len(rasters)))
-        found_printer.print_data(raster['data'], raster['margin'], i == len(rasters)-1)
+        if not dry_run:
+           found_printer.print_data(raster['data'], raster['margin'], i == len(rasters)-1)
 
     return 0
 

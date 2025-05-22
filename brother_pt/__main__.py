@@ -72,7 +72,7 @@ def cli():
         else:
             return 0
     elif args.cmd == 'print':
-        return do_print(args)
+        return print_all(args.printer, args.file, args.margin, args.rotate)
 
     return 0
 
